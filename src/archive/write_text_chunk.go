@@ -20,6 +20,11 @@ func dumpChunk(chunk io.Reader) {
 	buf := make([]byte, 4)
 	chunk.Read(buf)
 	fmt.Printf("chunk '%v' (%d byte)\n", string(buf), l)
+	if bytes.Equal(buf, []byte("tExt")) {
+		rawText := make([]byte, l)
+		chunk.Read(rawText)
+		fmt.Printf("%s\n", string(rawText))
+	}
 }
 
 func readChunks(file *os.File) []io.Reader {
