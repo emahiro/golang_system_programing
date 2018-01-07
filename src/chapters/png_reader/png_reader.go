@@ -1,4 +1,4 @@
-package main
+package png_reader
 
 import (
 	"encoding/binary"

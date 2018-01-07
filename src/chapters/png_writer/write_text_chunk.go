@@ -1,4 +1,4 @@
-package main
+package png_writer
 
 import (
 	"bytes"
@@ -16,7 +16,7 @@ const (
 func dumpChunk(chunk io.Reader) {
 	var l int32
 	binary.Read(chunk, binary.BigEndian, &l)
-	// png を4byteごとに分けるときのいれもの
+	// png をbyteに変換した時の入れ物
 	buf := make([]byte, 4)
 	chunk.Read(buf)
 	fmt.Printf("chunk '%v' (%d byte)\n", string(buf), l)
@@ -36,17 +36,16 @@ func readChunks(file *os.File) []io.Reader {
 	var ofs int64 = OFFSET
 
 	for {
+		// data長のいれもの
 		var l int32
 		err := binary.Read(file, binary.BigEndian, &l)
 		if err == io.EOF {
 			break
 		}
 
-		// 最初のchunk(4byte)から12(3 * 4byte)byte含めた16byteが1chunk
 		chunks = append(chunks, io.NewSectionReader(file, ofs, int64(l)+12))
 
 		// 次のchunkの先頭に移動
-		// 現在位置は長さを読み終わった箇所なのでchunk名（4byte） + data長 + CRC(4byte)先に移動する
 		ofs, _ = file.Seek(int64(l+8), 1)
 	}
 
